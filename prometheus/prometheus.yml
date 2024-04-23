@@ -1,0 +1,14 @@
+scrape_configs:
+  # Make Prometheus scrape itself for metrics.
+  - job_name: 'prometheus'
+    static_configs:
+    - targets: ['localhost:9090']
+
+  # Create a job for Docker daemons.
+  - job_name: 'docker'
+    static_configs:
+      - targets: ["host.docker.internal:9323"]
+    relabel_configs:
+      # Set hostname as instance label
+      - source_labels: [__meta_dockerswarm_node_hostname]
+        target_label: instance
