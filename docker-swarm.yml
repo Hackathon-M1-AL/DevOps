@@ -11,7 +11,7 @@ services:
       - "./nginx/nginx.conf:/etc/nginx/conf.d/default.conf"
 
   auth:
-    image: ghcr.io/hackathon-m1-al/authentification:v0.0.0
+    image: ghcr.io/hackathon-m1-al/authentification:v0.0.4
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/testdb
       - SPRING_DATASOURCE_USERNAME=postgres
@@ -39,7 +39,7 @@ services:
         prometheus.enabled: "true"
 
   api-crud:
-    image: ghcr.io/hackathon-m1-al/api-crud:v0.0.0
+    image: ghcr.io/hackathon-m1-al/api-crud:v0.0.1
     environment:
       - SPRING_DATASOURCE_URL=jdbc:mysql://api-crud-database:3306/hackathon_api
       - SPRING_DATASOURCE_USERNAME=root
@@ -58,6 +58,15 @@ services:
       - MYSQL_DATABASE=hackathon_api
     ports:
       - "3306:3306"
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+  
+  front:
+    image: ghcr.io/hackathon-m1-al/frontend:v0.0.2
+    ports:
+      - "4173:4173"
     deploy:
       replicas: 1
       restart_policy:
