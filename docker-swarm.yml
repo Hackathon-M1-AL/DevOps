@@ -1,0 +1,64 @@
+services:
+  nginx:
+    image: nginx:1.25.5-alpine-slim
+    ports:
+      - "8000:80"
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    volumes:
+      - "./nginx/nginx.conf:/etc/nginx/conf.d/default.conf"
+
+  auth:
+    image: ghcr.io/hackathon-m1-al/authentification:v0.0.0
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/testdb
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=123
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:latest
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=123
+      - POSTGRES_DB=testdb
+    ports:
+      - "5432:5432"
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      labels:
+        prometheus.enabled: "true"
+
+  api-crud:
+    image: ghcr.io/hackathon-m1-al/api-crud:v0.0.0
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://api-crud-database:3306/hackathon_api
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    depends_on:
+      - api-crud-database
+
+  api-crud-database:
+    image: mysql:8.3
+    environment:
+      - MYSQL_ALLOW_EMPTY_PASSWORD=yes
+      - MYSQL_DATABASE=hackathon_api
+    ports:
+      - "3306:3306"
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
