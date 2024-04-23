@@ -55,3 +55,8 @@ Supprimer le stack:
 ```bash
 docker stack rm hackathon
 ```
+
+## Nginx
+
+Le Nginx sert de API Gateway à notre application.
+On l'utilise aussi pour authentifier les requêtes avec le service Auth.
